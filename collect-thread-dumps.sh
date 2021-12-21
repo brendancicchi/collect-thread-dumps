@@ -48,16 +48,15 @@ function jcmd_collection()
 
 function jcmd_verification()
 {
+    if ! grep java <(ps -p $PID -o command | grep -Ev "^COMMAND$") &> /dev/null
+    then
+        echo "ERROR: There is no visable JVM process with pid $PID"
+        exit 1
+    fi
     _process_user=$(ps -p $PID -o user | grep -Ev "^USER$")
     if [[ $_process_user != $(whoami) ]]
     then
         echo "ERROR: Collecting thread dumps as jcmd must be run as the exact same user as the JVM process owner, $_process_user"
-        exit 1
-    fi
-    if ! grep $PID <($JCMD) &> /dev/null
-    then
-        echo "ERROR: jcmd cannot find the pid $PID. Visible Java processes are:"
-        $JCMD
         exit 1
     fi
     if ! touch $THREAD_OUTPUT $TOP_OUTPUT &> /dev/null
@@ -81,7 +80,6 @@ function kill3_collection()
 function kill3_verification()
 {
     _launch_cmd=$(ps -p $PID -o command | grep -Ev "^COMMAND$")
-    echo "$_launch_cmd"
     if [ -z "$_launch_cmd" ]
     then
         echo "Unable to find the pid $PID via ps"
