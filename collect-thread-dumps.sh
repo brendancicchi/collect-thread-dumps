@@ -50,7 +50,7 @@ function jcmd_verification()
 {
     if ! grep java <(ps -p $PID -o command | grep -Ev "^COMMAND$") &> /dev/null
     then
-        echo "ERROR: There is no visable JVM process with pid $PID"
+        echo "ERROR: There is no visible JVM process with pid $PID"
         exit 1
     fi
     _process_user=$(ps -p $PID -o user | grep -Ev "^USER$")
